@@ -121,9 +121,9 @@ Graphics._createFPSMeter = function () {
             ctx.textBaseline = 'bottom';
             const value = this.mode === 1 ? this.fps : this.ms.toFixed(1);
             const label = this.mode === 1 ? 'FPS' : 'MS';
-            ctx.fillText(`${label}: ${value}`, 1, this.height - 20);
+            ctx.fillText(`${label}: ${value}`, 1, this.height - 18);
             ctx.font = '12px Consolas, monospace';
-            ctx.fillText(`${this.detectRPGMakerVersion()}`, 1, this.height - 5);
+            ctx.fillText(`${this.detectRPGMakerVersion()}`, 1, this.height - 3);
         },
 
         // Switch between modes (hidden, FPS, MS) like the og version
@@ -181,7 +181,7 @@ Graphics._createModeBox = function () {
     // We don't need it v4 calls this shit but we dont care
 };
 
-/// RPGMZ Compatibility
+/// RPGMZ Comapatibility
 
 Graphics.FPSCounter.prototype.initialize = function () {
 
