@@ -181,7 +181,7 @@ Graphics._createModeBox = function () {
     // We don't need it v4 calls this shit but we dont care
 };
 
-/// RPGMZ Comapatibility
+/// RPGMZ Compatibility
 
 Graphics.FPSCounter.prototype.initialize = function () {
 
