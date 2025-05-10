@@ -18,7 +18,6 @@ Graphics._createFPSMeter = function () {
         y: parseInt(this.pluginParams.y) || 30,
         barWidth: parseInt(this.pluginParams.barWidth) || 3,
         gap: parseInt(this.pluginParams.barGap) || 2,
-
         // flags
         isMobile: Utils.isMobileDevice(),
         // State
@@ -34,6 +33,10 @@ Graphics._createFPSMeter = function () {
         // our own canvas and context i wonder if i can reuse rpgmv core canvas and ctx. hmm
         canvas: null,
         ctx: null,
+        game_render: null,
+        game_render_type:  null,
+        rpgm_name: Utils.RPGMAKER_NAME,
+        rpgm_fullname: `RPG Maker ${Utils.RPGMAKER_NAME}`,
 
         // Initialize
         init: function () {
@@ -65,18 +68,6 @@ Graphics._createFPSMeter = function () {
                 display: none;
             `;
             document.body.appendChild(this.canvas);
-        },
-
-        getRendererInfo: function () {
-            try {
-                if (PIXI.utils.isWebGLSupported()) {
-                    const renderer = Graphics.app.renderer;
-                    return renderer.type === PIXI.RENDERER_TYPE.WEBGL ? "WebGL" : "Canvas";
-                }
-                return "Canvas";
-            } catch (e) {
-                return "Unknown";
-            }
         },
 
         // Update metrics
@@ -140,7 +131,7 @@ Graphics._createFPSMeter = function () {
             ctx.fillText(`${label}: ${value}`, 1, this.height - 18);
             ctx.strokeText(`${label}: ${value}`, 1, this.height - 18);
             ctx.font = '12px Consolas';
-            ctx.fillText(`${this.detectRPGMakerVersion()}`, 1, this.height - 3);
+            ctx.fillText(`Renderer: ${this.game_render_type}`, 1, this.height - 3);
         },
 
         // Switch between modes (hidden, FPS, MS) like the og version
@@ -176,11 +167,19 @@ Graphics.tickStart = function () {
 // End of frame
 Graphics.tickEnd = function () {
     if (!this._fpsMeter) this._createFPSMeter();
-
     this._fpsMeter.update();
     this._fpsMeter.render();
-
     if (this._originalTickEnd) this._originalTickEnd.call(this);
+    if(!this._fpsMeter.game_render_type)
+    {
+        this._fpsMeter.game_render = this._renderer;
+        if(Utils.RPGMAKER_NAME == 'MZ')
+            this._fpsMeter.game_render_type = 'WebGL'; // it only works on webgl base on what i read
+        else if(Utils.RPGMAKER_NAME == 'MV')
+            this._fpsMeter.game_render_type = this._renderer.type === PIXI.RENDERER_TYPE.WEBGL ? 'WebGL' : 'Canvas';
+        else
+            this._fpsMeter.game_render_type = 'Canvas';
+    }
 };
 
 // This called when we press f2 XD
