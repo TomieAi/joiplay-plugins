@@ -33,8 +33,7 @@ Graphics._createFPSMeter = function () {
         // our own canvas and context i wonder if i can reuse rpgmv core canvas and ctx. hmm
         canvas: null,
         ctx: null,
-        game_render: null,
-        game_render_type:  null,
+        game_render_type: null,
         rpgm_name: Utils.RPGMAKER_NAME,
         rpgm_fullname: `RPG Maker ${Utils.RPGMAKER_NAME}`,
 
@@ -93,8 +92,22 @@ Graphics._createFPSMeter = function () {
             }
         },
 
-        detectRPGMakerVersion: function () {
-            return `RPG Maker ${Utils.RPGMAKER_NAME}`;
+        detectRenderType: function (game_renderer) {
+            if (this.game_render_type) return;
+            switch (Utils.RPGMAKER_NAME) {
+                case 'MZ':
+                    // MZ is assumed to always use WebGL for some reason
+                    this.game_render_type = 'WebGL';
+                    break;
+                case 'MV':
+                    // MV can use either WebGL or Canvas.. Canvas sucks tho hehe
+                    this.game_render_type = game_renderer.type === PIXI.RENDERER_TYPE.WEBGL ? 'WebGL' : 'Canvas';
+                    break;
+                default:
+                    // Fallback to Canvas for any unknown types
+                    this._fpsMeter.game_render_type = 'Canvas';
+                    break;
+            }
         },
 
         // Render display | I have to read https://developer.mozilla.org/en-US/ on how it works.
@@ -170,16 +183,7 @@ Graphics.tickEnd = function () {
     this._fpsMeter.update();
     this._fpsMeter.render();
     if (this._originalTickEnd) this._originalTickEnd.call(this);
-    if(!this._fpsMeter.game_render_type)
-    {
-        this._fpsMeter.game_render = this._renderer;
-        if(Utils.RPGMAKER_NAME == 'MZ')
-            this._fpsMeter.game_render_type = 'WebGL'; // it only works on webgl base on what i read
-        else if(Utils.RPGMAKER_NAME == 'MV')
-            this._fpsMeter.game_render_type = this._renderer.type === PIXI.RENDERER_TYPE.WEBGL ? 'WebGL' : 'Canvas';
-        else
-            this._fpsMeter.game_render_type = 'Canvas';
-    }
+    this._fpsMeter.detectRenderType(this._renderer);
 };
 
 // This called when we press f2 XD
