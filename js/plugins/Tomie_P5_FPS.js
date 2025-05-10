@@ -11,13 +11,13 @@ Graphics._createFPSMeter = function () {
     this._fpsMeter = {
         // Some basic settings
         maxHistory: 0, // no need to set this we gonna calculate it dynamically
-        width: this.pluginParams.width || 130,
-        height: this.pluginParams.height || 80,
-        interval: this.pluginParams.interval || 200,
-        x: this.pluginParams.x || 30,
-        y: this.pluginParams.y || 30,
-        barWidth: this.pluginParams.barWidth || 3,
-        gap: this.pluginParams.barGap || 1,
+        width: parseInt(this.pluginParams.width) || 130,
+        height: parseInt(this.pluginParams.height) || 80,
+        interval: parseInt(this.pluginParams.interval) || 200,
+        x: parseInt(this.pluginParams.x) || 30,
+        y: parseInt(this.pluginParams.y) || 30,
+        barWidth: parseInt(this.pluginParams.barWidth) || 3,
+        gap: parseInt(this.pluginParams.barGap) || 2,
 
         // flags
         isMobile: /Mobi|Android/i.test(navigator.userAgent),
