@@ -9,6 +9,7 @@ Graphics._createFPSMeter = function () {
         maxHistory: 45,
         width: 130,
         height: 80,
+        interval: 200,
         x: 30,
         y: 30,
 
@@ -44,11 +45,13 @@ Graphics._createFPSMeter = function () {
                 z-index: 9999;
                 background: rgba(0,0,0,0.5);
                 display: none;
+                font-smooth: never;
+                -webkit-font-smoothing: none;
+                text-rendering: geometricPrecision;
             `;
             document.body.appendChild(this.canvas);
             this.ctx = this.canvas.getContext('2d');
-
-
+            this.ctx.imageSmoothingEnabled = false;
         },
 
         getRendererInfo: function () {
@@ -66,18 +69,19 @@ Graphics._createFPSMeter = function () {
         // Update metrics
         update: function () {
             const now = performance.now();
-            this.ms = now - this.startTime;
+            const frameTime = now - this.startTime;
+            this.ms = frameTime;
             this.frames++;
-
-            // Calculate FPS every second
-            if (now - this.lastTime >= 1000) {
-                this.fps = this.frames;
+        
+            const elapsed = now - this.lastTime;
+            if (elapsed >= this.interval) {
+                this.fps = (this.frames * 1000) / elapsed;
                 this.frames = 0;
                 this.lastTime = now;
-
-                // Add to history
+        
                 if (this.mode > 0) {
-                    this.history.push(this.mode === 1 ? this.fps : this.ms);
+                    const value = this.mode === 1 ? this.fps : this.ms;
+                    this.history.push(value);
                     if (this.history.length > this.maxHistory) {
                         this.history.shift();
                     }
@@ -116,13 +120,16 @@ Graphics._createFPSMeter = function () {
 
             // Fix ME: it seems the font is quite a bit blurry.
             // Draw current value
-            ctx.font = '16px Consolas, monospace';
+            ctx.font = '16px Consolas';
             ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1;
             ctx.textBaseline = 'bottom';
-            const value = this.mode === 1 ? this.fps : this.ms.toFixed(1);
+            const value = this.mode === 1 ? Math.round(this.fps) : this.ms.toFixed(1);
             const label = this.mode === 1 ? 'FPS' : 'MS';
             ctx.fillText(`${label}: ${value}`, 1, this.height - 18);
-            ctx.font = '12px Consolas, monospace';
+            ctx.strokeText(`${label}: ${value}`, 1, this.height - 18);
+            ctx.font = '12px Consolas';
             ctx.fillText(`${this.detectRPGMakerVersion()}`, 1, this.height - 3);
         },
 
