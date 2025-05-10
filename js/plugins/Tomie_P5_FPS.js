@@ -20,8 +20,7 @@ Graphics._createFPSMeter = function () {
         gap: parseInt(this.pluginParams.barGap) || 2,
 
         // flags
-        isMobile: /Mobi|Android/i.test(navigator.userAgent),
-        isMZ: typeof Graphics.FPSCounter == "function",
+        isMobile: Utils.isMobileDevice(),
         // State
         visible: false,
         mode: 0, // 0 = hidden, 1 = FPS, 2 = MS // Base on the original mode state of old FPSMeter Script
@@ -66,6 +65,7 @@ Graphics._createFPSMeter = function () {
                 display: none;
             `;
             document.body.appendChild(this.canvas);
+            alert(Utils.RPGMAKER_NAME)
         },
 
         getRendererInfo: function () {
@@ -104,7 +104,7 @@ Graphics._createFPSMeter = function () {
         },
 
         detectRPGMakerVersion: function () {
-            return this.isMZ ? 'RPG Maker MZ' : 'RPG Maker MV';
+            return `RPG Maker ${Utils.RPGMAKER_NAME}`;
         },
 
         // Render display | I have to read https://developer.mozilla.org/en-US/ on how it works.
