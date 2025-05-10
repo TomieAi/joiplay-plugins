@@ -1,17 +1,23 @@
 // FPS Meter Implementation exclusive for JOIPLAY
-// by TomieAi
+// @Author: TomieAi
+// @Version: 1.2
+// @Date:05/10/2025
+//////////////////////////////////////////////////////////////////////////
 // I tried my best to make it none distructive repalcement hehehe
 // And I also try to mimic the original behavior as much as possible
 //////////////////////////////////////////////////////////////////////////
 Graphics._createFPSMeter = function () {
+    this.pluginParams = PluginManager.parameters('Tomie_P5_FPS');
     this._fpsMeter = {
         // Some basic settings
-        maxHistory: 45,
-        width: 130,
-        height: 80,
-        interval: 200,
-        x: 30,
-        y: 30,
+        maxHistory: 0, // no need to set this we gonna calculate it dynamically
+        width: this.pluginParams.width || 130,
+        height: this.pluginParams.height || 80,
+        interval: this.pluginParams.interval || 200,
+        x: this.pluginParams.x || 30,
+        y: this.pluginParams.y || 30,
+        barWidth: this.pluginParams.barWidth || 3,
+        gap: this.pluginParams.barGap || 1,
 
         // flags
         isMobile: /Mobi|Android/i.test(navigator.userAgent),
@@ -33,9 +39,13 @@ Graphics._createFPSMeter = function () {
         // Initialize
         init: function () {
             if (this.canvas) return;
+            // Adjust the max history base on how much bar we can fit on the width.
+            this.maxHistory = Math.floor((this.width + this.gap) / (this.barWidth + this.gap));
+            // Adjust the width to perfectly fit all bars if they overlap.
+            this.width = Math.round(this.maxHistory * (this.barWidth + this.gap));
             // Create canvas
             this.canvas = document.createElement('canvas');
-            var scale = window.devicePixelRatio; 
+            var scale = window.devicePixelRatio;
             this.canvas.width = Math.floor(this.width * scale);
             this.canvas.height = Math.floor(this.height * scale);
             this.ctx = this.canvas.getContext('2d');
@@ -76,13 +86,13 @@ Graphics._createFPSMeter = function () {
             const frameTime = now - this.startTime;
             this.ms = frameTime;
             this.frames++;
-        
+
             const elapsed = now - this.lastTime;
             if (elapsed >= this.interval) {
                 this.fps = (this.frames * 1000) / elapsed;
                 this.frames = 0;
                 this.lastTime = now;
-        
+
                 if (this.mode > 0) {
                     const value = this.mode === 1 ? this.fps : this.ms;
                     this.history.push(value);
@@ -106,20 +116,18 @@ Graphics._createFPSMeter = function () {
 
             // Draw history graph
             const graphHeight = this.height - 42;
-            const barWidth = 2;
-            const gap = 1;
 
             for (let i = 0; i < this.history.length; i++) {
                 const value = this.history[i];
                 const maxValue = this.mode === 1 ? 60 : 33;
                 const height = Math.min(value / maxValue, 1) * graphHeight;
-                const x = i * (barWidth + gap);
+                const x = i * (this.barWidth + this.gap);
                 const y = graphHeight - height;
 
                 ctx.fillStyle = this.mode === 1 ?
                     `hsl(${Math.min(value * 2, 120)}, 80%, 50%)` :
                     `hsl(${Math.max(0, 120 - value * 3)}, 80%, 50%)`;
-                ctx.fillRect(x, y, barWidth, height);
+                ctx.fillRect(x, y, this.barWidth, height);
             }
 
             // Draw current value
@@ -192,7 +200,6 @@ Graphics._createModeBox = function () {
 };
 
 /// RPGMZ Compatibility
-
 Graphics.FPSCounter.prototype.initialize = function () {
 
 }

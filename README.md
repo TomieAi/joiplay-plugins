@@ -12,7 +12,15 @@
             "name": "Tomie_P5_FPS",
             "status": true,
             "description": "RPGM MV/MZ FPS Monitor | Compatible with JoiPlay RPGM MV PixiJS v5",
-            "parameters": {}
+            "parameters": {
+                "width": 130,
+                "height": 80,
+                "x": 30,
+                "y": 30,
+                "interval": 200,
+                "barWidth": 3,
+                "barGap": 2
+            }
         }
     ];
     ```
