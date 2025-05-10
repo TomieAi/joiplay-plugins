@@ -35,23 +35,27 @@ Graphics._createFPSMeter = function () {
             if (this.canvas) return;
             // Create canvas
             this.canvas = document.createElement('canvas');
-            this.canvas.width = this.width;
-            this.canvas.height = this.height;
+            var scale = window.devicePixelRatio; 
+            this.canvas.width = Math.floor(this.width * scale);
+            this.canvas.height = Math.floor(this.height * scale);
+            this.ctx = this.canvas.getContext('2d');
+            this.ctx.imageSmoothingEnabled = false;
+            this.ctx.mozImageSmoothingEnabled = false;
+            this.ctx.webkitImageSmoothingEnabled = false;
+            this.ctx.msImageSmoothingEnabled = false;
+            this.ctx.scale(scale, scale);
             this.canvas.style.cssText = `
                 position: absolute;
+                width: ${this.width}px;
+                height: ${this.height}px;
                 left: ${this.x}px;
                 top: ${this.y}px;
                 pointer-events: none;
                 z-index: 9999;
                 background: rgba(0,0,0,0.5);
                 display: none;
-                font-smooth: never;
-                -webkit-font-smoothing: none;
-                text-rendering: geometricPrecision;
             `;
             document.body.appendChild(this.canvas);
-            this.ctx = this.canvas.getContext('2d');
-            this.ctx.imageSmoothingEnabled = false;
         },
 
         getRendererInfo: function () {
@@ -118,7 +122,6 @@ Graphics._createFPSMeter = function () {
                 ctx.fillRect(x, y, barWidth, height);
             }
 
-            // Fix ME: it seems the font is quite a bit blurry.
             // Draw current value
             ctx.font = '16px Consolas';
             ctx.fillStyle = 'white';
