@@ -194,7 +194,9 @@ Graphics._switchFPSMeter = function () {
     if (!this._fpsMeter) this._createFPSMeter();
     this._fpsMeter.switchMode();
 };
-
+// Hide/Show FPS lets just ignore the original
+Graphics.showFps = function () {}
+Graphics.hideFps = function () {}
 // Override mode box creation
 Graphics._createModeBox = function () {
     // Disable the empty box that comes with the fps shit.
@@ -202,9 +204,7 @@ Graphics._createModeBox = function () {
 };
 
 /// RPGMZ Compatibility
-Graphics.FPSCounter.prototype.initialize = function () {
-
-}
+Graphics.FPSCounter.prototype.initialize = function () {}
 Graphics.FPSCounter.prototype.startTick = function () {
     Graphics.tickStart();
 };
