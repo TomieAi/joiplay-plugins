@@ -20,6 +20,7 @@ Graphics._createFPSMeter = function () {
         gap: parseInt(this.pluginParams.barGap) || 2,
         // flags
         isMobile: Utils.isMobileDevice(),
+        isMZ: Utils.RPGMAKER_NAME === 'MZ',
         // State
         visible: false,
         mode: 0, // 0 = hidden, 1 = FPS, 2 = MS // Base on the original mode state of old FPSMeter Script
@@ -110,42 +111,68 @@ Graphics._createFPSMeter = function () {
             }
         },
 
-        // Render display | I have to read https://developer.mozilla.org/en-US/ on how it works.
         render: function () {
             if (!this.visible || !this.canvas || this.mode === 0) return;
 
             const ctx = this.ctx;
             ctx.clearRect(0, 0, this.width, this.height);
 
-            // Draw history graph
-            const graphHeight = this.height - 42;
-
+            const lines = [
+                {
+                    text: `${this.mode === 1 ? 'FPS' : 'MS'}: ${this.mode === 1 ? Math.round(this.fps) : this.ms.toFixed(1)}`,
+                    font: 'Consolas',
+                    fontSize: 16,
+                    stroke: true,
+                    color: 'white'
+                },
+                {
+                    text: `Renderer: ${this.game_render_type}`,
+                    font: 'Consolas',
+                    fontSize: 12,
+                    stroke: false,
+                    color: '#fbfcf8'
+                },
+                {
+                    text: this.rpgm_fullname,
+                    font: 'Consolas',
+                    fontSize: 12,
+                    stroke: false,
+                    color: '#fbfcf8'
+                }
+            ];
+            
+            const textPadding = 2;
+            const lineSpacing = 1;
+            // Calculate total text height but also skip spacing on the last one.
+            const totalTextHeight = lines.reduce((sum, line) => sum + line.fontSize, -lineSpacing);
+            const graphHeight = this.height - totalTextHeight  - textPadding * 2;
+            // Draw our cute history graph
             for (let i = 0; i < this.history.length; i++) {
                 const value = this.history[i];
                 const maxValue = this.mode === 1 ? 60 : 33;
-                const height = Math.min(value / maxValue, 1) * graphHeight;
+                const barHeight = Math.min(value / maxValue, 1) * graphHeight;
                 const x = i * (this.barWidth + this.gap);
-                const y = graphHeight - height;
+                const y = graphHeight - barHeight;
 
-                ctx.fillStyle = this.mode === 1 ?
-                    `hsl(${Math.min(value * 2, 120)}, 80%, 50%)` :
-                    `hsl(${Math.max(0, 120 - value * 3)}, 80%, 50%)`;
-                ctx.fillRect(x, y, this.barWidth, height);
+                ctx.fillStyle = this.mode === 1
+                    ? `hsl(${Math.min(value * 2, 120)}, 80%, 50%)`
+                    : `hsl(${Math.max(0, 120 - value * 3)}, 80%, 50%)`;
+                ctx.fillRect(x, y, this.barWidth, barHeight);
             }
-
-            // Draw current value
-            ctx.font = '16px Consolas';
-            ctx.fillStyle = 'white';
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 1;
-            ctx.textBaseline = 'bottom';
-            const value = this.mode === 1 ? Math.round(this.fps) : this.ms.toFixed(1);
-            const label = this.mode === 1 ? 'FPS' : 'MS';
-            ctx.fillText(`${label}: ${value}`, 1, this.height - 18);
-            ctx.strokeText(`${label}: ${value}`, 1, this.height - 18);
-            ctx.font = '12px Consolas';
-            ctx.fillText(`Renderer: ${this.game_render_type}`, 1, this.height - 3);
+            // Draw our text here base on config above
+            let textY = graphHeight + textPadding;
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                ctx.font = `${line.fontSize}px ${line.font}`;
+                ctx.textBaseline = 'hanging';
+                ctx.fillStyle = line.color;
+                ctx.strokeStyle = line.color;
+                ctx.fillText(line.text, 1, textY);
+                if (line.stroke) ctx.strokeText(line.text, 1, textY);
+                textY += line.fontSize + lineSpacing;
+            }
         },
+
 
         // Switch between modes (hidden, FPS, MS) like the og version
         switchMode: function () {
@@ -195,8 +222,8 @@ Graphics._switchFPSMeter = function () {
     this._fpsMeter.switchMode();
 };
 // Hide/Show FPS lets just ignore the original
-Graphics.showFps = function () {}
-Graphics.hideFps = function () {}
+Graphics.showFps = function () { }
+Graphics.hideFps = function () { }
 // Override mode box creation
 Graphics._createModeBox = function () {
     // Disable the empty box that comes with the fps shit.
@@ -204,7 +231,7 @@ Graphics._createModeBox = function () {
 };
 
 /// RPGMZ Compatibility
-Graphics.FPSCounter.prototype.initialize = function () {}
+Graphics.FPSCounter.prototype.initialize = function () { }
 Graphics.FPSCounter.prototype.startTick = function () {
     Graphics.tickStart();
 };
