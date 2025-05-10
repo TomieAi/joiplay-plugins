@@ -65,7 +65,6 @@ Graphics._createFPSMeter = function () {
                 display: none;
             `;
             document.body.appendChild(this.canvas);
-            alert(Utils.RPGMAKER_NAME)
         },
 
         getRendererInfo: function () {
