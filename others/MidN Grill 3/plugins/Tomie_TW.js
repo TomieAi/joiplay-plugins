@@ -1,5 +1,5 @@
 /*
-@about This plugin is for MidN Grill 3 only
+@about Hmm experimental plugin works on some games other than this one.
 @author TomieAi
 @version 1.2
 
