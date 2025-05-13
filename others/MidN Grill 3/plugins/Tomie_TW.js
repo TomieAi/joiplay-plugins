@@ -1,5 +1,5 @@
 /*
-@about Hmm experimental plugin works on some games other than this one.
+@about RPGMMV TextWrapper by Pixel or by Config | WIP
 @author TomieAi
 @version 1.2
 
@@ -159,7 +159,9 @@ Window_Message.prototype.startMessage = function () {
 var original_command231 = Game_Interpreter.prototype.command231;
 Game_Interpreter.prototype.command231 = function () {
     original_command231.call(this);
+    if (!TomiePluginConfig || TomiePluginConfig.length === 0) return true;
     for(var i = 0; i < TomiePluginConfig.length; i++) {
+        if(!TomiePluginConfig[i]) continue;
         if (TomiePluginConfig[i].name === this._params[1]) {
             message_background = this._params[1];
             break;
