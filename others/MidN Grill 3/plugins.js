@@ -555,7 +555,7 @@ var $plugins =
   {
       "name": "Tomie_TW",
       "status": true,
-      "description": "RPGMV Text Wrapper",
+      "description": "Custom RPGMV Text Wrapper for MidN Grill 3",
       "parameters": {}
     }
 ];
