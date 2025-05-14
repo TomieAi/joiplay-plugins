@@ -1,3 +1,5 @@
+Project Moved: https://gitlab.com/tomieai-vn-translations/rpgm-mtl-plugins
+
 # My JoiPlay Exclusive Plugins
 
 
