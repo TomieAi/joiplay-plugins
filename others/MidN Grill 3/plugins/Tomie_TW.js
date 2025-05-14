@@ -3,7 +3,7 @@
 @author TomieAi
 @version 1.2
 
-This game uses old version of node version 3.x.x i hate this xD its so messy cant use some api on modern node.
+Some games uses old version of node version 3.x.x i hate this xD its so messy cant use some api on modern node.
 */
 var TomiePluginParams = PluginManager.parameters('Tomie_TW');
 var TomiePluginConfig = TomiePluginParams.config || [];
@@ -129,39 +129,24 @@ TomieTextWrapper.prototype.wrap = function () {
     return lines.join('\n');
 }
 
-var bitmap_bg = null;
 var message_background = "";
-Window_Message.prototype.updateBackground = function () {
-    this._background = $gameMessage.background();
-    this.setBackgroundType(this._background);
-    if (this.contents) bitmap_bg = this.contents;
-}
-var o_sprite_onbitmapload = Sprite.prototype._onBitmapLoad;
-Sprite.prototype._onBitmapLoad = function (bitmapLoaded) {
-    o_sprite_onbitmapload.call(this, bitmapLoaded);
-    if (!bitmap_bg) bitmap_bg = bitmapLoaded;
-}
 Window_Base.prototype.standardFontSize = function () {
     return TomiePluginParams.fontSize || 18;
 };
 Window_Base.prototype.standardPadding = function () {
     return TomiePluginParams.padding || 18;
 };
+var tomie_original_startMessage = Window_Message.prototype.startMessage;
 Window_Message.prototype.startMessage = function () {
-    this._textState = {};
-    this._textState.index = 0;
-    this._textState.text = new TomieTextWrapper(this.convertEscapeCharacters($gameMessage.allText()), message_background, bitmap_bg, this.contentsWidth()).wrap();
-    this.newPage(this._textState);
-    this.updatePlacement();
-    this.updateBackground();
-    this.open();
+    tomie_original_startMessage.call(this);
+    this._textState.text = new TomieTextWrapper(this.convertEscapeCharacters($gameMessage.allText()), message_background, this.contents, this.contentsWidth()).wrap();
 }
 var original_command231 = Game_Interpreter.prototype.command231;
 Game_Interpreter.prototype.command231 = function () {
     original_command231.call(this);
     if (!TomiePluginConfig || TomiePluginConfig.length === 0) return true;
-    for(var i = 0; i < TomiePluginConfig.length; i++) {
-        if(!TomiePluginConfig[i]) continue;
+    for (var i = 0; i < TomiePluginConfig.length; i++) {
+        if (!TomiePluginConfig[i]) continue;
         if (TomiePluginConfig[i].name === this._params[1]) {
             message_background = this._params[1];
             break;
